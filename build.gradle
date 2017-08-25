@@ -21,9 +21,13 @@ repositories {
 	maven {
 		url 'http://neuroph.sourceforge.net/maven2/'
 	}
+	
+	flatDir {
+       dirs 'libs'
+	}
 }
 
-ext.jmeVersion = '3.1.0-beta1'
+ext.jmeVersion = '3.1.0-stable'
 
 project(":assets") {
     apply plugin: "java"
@@ -46,23 +50,23 @@ dependencies {
 	compile 'org.neuroph:neuroph-core:2.94'
 
 	//jme
-    compile "org.jmonkeyengine:jme3-core:$jmeVersion"
-    compile "org.jmonkeyengine:jme3-desktop:$jmeVersion"
-    compile "org.jmonkeyengine:jme3-lwjgl:$jmeVersion"
-
-    //compile "org.jmonkeyengine:jme3-android-native:$jmeVersion"
-    //compile "org.jmonkeyengine:jme3-android:$jmeVersion"
-    //compile "org.jmonkeyengine:jme3-bullet-native-android:$jmeVersion"
-    //compile "org.jmonkeyengine:jme3-blender:$jmeVersion"
-    //compile "org.jmonkeyengine:jme3-bullet-native:$jmeVersion"
-    //compile "org.jmonkeyengine:jme3-bullet:$jmeVersion"
-    //compile "org.jmonkeyengine:jme3-effects:$jmeVersion"
-    //compile "org.jmonkeyengine:jme3-jogg:$jmeVersion"
-    //compile "org.jmonkeyengine:jme3-jogl:$jmeVersion"
-    //compile "org.jmonkeyengine:jme3-lwjgl3:$jmeVersion"
-    //compile "org.jmonkeyengine:jme3-networking:$jmeVersion"
-    //compile "org.jmonkeyengine:jme3-plugins:$jmeVersion"
-    //compile "org.jmonkeyengine:jme3-terrain:$jmeVersion"
+	compile "org.jmonkeyengine:jme3-core:$jmeVersion"
+	compile "org.jmonkeyengine:jme3-desktop:$jmeVersion"
+	compile "org.jmonkeyengine:jme3-lwjgl:$jmeVersion"
+	
+	//compile "org.jmonkeyengine:jme3-android-native:$jmeVersion"
+	//compile "org.jmonkeyengine:jme3-android:$jmeVersion"
+	//compile "org.jmonkeyengine:jme3-bullet-native-android:$jmeVersion"
+	//compile "org.jmonkeyengine:jme3-blender:$jmeVersion"
+	compile "org.jmonkeyengine:jme3-bullet-native:$jmeVersion"
+	compile "org.jmonkeyengine:jme3-bullet:$jmeVersion"
+	//compile "org.jmonkeyengine:jme3-effects:$jmeVersion"
+	//compile "org.jmonkeyengine:jme3-jogg:$jmeVersion"
+	//compile "org.jmonkeyengine:jme3-jogl:$jmeVersion"
+	//compile "org.jmonkeyengine:jme3-lwjgl3:$jmeVersion"
+	//compile "org.jmonkeyengine:jme3-networking:$jmeVersion"
+	//compile "org.jmonkeyengine:jme3-plugins:$jmeVersion"
+	//compile "org.jmonkeyengine:jme3-terrain:$jmeVersion"
 	
 	//lemur
 	compile "com.simsilica:lemur:1.10.1"
@@ -76,6 +80,8 @@ dependencies {
 	compile 'org.slf4j:slf4j-api:1.7.25'
 	compile 'ch.qos.logback:logback-classic:1.2.3'
 	compile 'ch.qos.logback:logback-core:1.2.3'
+
+	compile name: 'Lina'
 
     runtime project(':assets')
 }
