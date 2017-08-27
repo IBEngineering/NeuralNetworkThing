@@ -1,4 +1,4 @@
-package io.github.ibengineering.tests;
+package io.github.ibengineering.nnt.tests;
 
 import java.util.Arrays;
 

@@ -1,4 +1,4 @@
-package io.github.ibengineering;
+package io.github.ibengineering.nnt;
 
 import com.jme3.app.DebugKeysAppState;
 import com.jme3.app.FlyCamAppState;
@@ -8,7 +8,8 @@ import com.jme3.app.state.ScreenshotAppState;
 import com.jme3.audio.AudioListenerState;
 import com.jme3.bullet.BulletAppState;
 
-import io.github.ibengineering.tests.PoolNeuralNetworkTestState;
+import io.github.ibengineering.nnt.tests.PoolNeuralNetworkTestState;
+import io.github.ibengineering.nnt.tests.SteererState;
 
 public class Main extends SimpleApplication {
 	
@@ -32,7 +33,8 @@ public class Main extends SimpleApplication {
 			new AudioListenerState(),
 			new DebugKeysAppState(),
 			new ScreenshotAppState("images/", 0),
-			new PoolNeuralNetworkTestState()
+//			new PoolNeuralNetworkTestState()
+			new SteererState()
 		);
 	}
 	

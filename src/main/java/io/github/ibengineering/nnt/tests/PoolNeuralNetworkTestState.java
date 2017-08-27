@@ -1,4 +1,4 @@
-package io.github.ibengineering.tests;
+package io.github.ibengineering.nnt.tests;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -31,9 +31,10 @@ import com.jme3.scene.debug.Arrow;
 import com.jme3.scene.debug.Grid;
 import com.jme3.scene.shape.Sphere;
 
-import io.github.mistercavespider.lina.color.GradientColorController;
+import io.github.mistercavespider.lina.color.TransparentColorControl;
 import io.github.mistercavespider.lina.ctrl.TimeTracer;
 
+@SuppressWarnings("rawtypes")
 public class PoolNeuralNetworkTestState extends BaseAppState {
 
 	public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map) {
@@ -57,17 +58,19 @@ public class PoolNeuralNetworkTestState extends BaseAppState {
 	private ExecutorService pool;
 	private Future<?>[] futures;
 	
-	private int nnetCount = 500;
-	@SuppressWarnings("rawtypes")
+	private int nnetCount = 250;
 	private NeuralNetwork[] nnets;
 	private Vector3f goal;
 	private Vector3f lastGoalDirection;
 	private double originalDistance;
-	private double maxSpeed = 1d;
+	private double maxSpeed = 0.046d;
 	
 	private HashMap<NeuralNetwork, Float> scores;
 	
 	private int runCounter = 0;
+	
+	private Arrow a;
+	private Geometry goalg;
 	
 	@Override
 	protected void initialize(Application app) {
@@ -96,20 +99,34 @@ public class PoolNeuralNetworkTestState extends BaseAppState {
 	}
 	
 	private void populateProps() {
+		ColorRGBA propColor = new ColorRGBA(0,0.4f,1,1);
+		
 		Material propmat = ballmat.clone();
-		propmat.setColor("Color", new ColorRGBA(0,0.4f,1,1));
+		propmat.setColor("Color", propColor);
+		propmat.getAdditionalRenderState().setWireframe(true);
 		
 		Material arrowmat = ballmat.clone();
 		arrowmat.setColor("Color", ColorRGBA.White);
+		
+		Material proplinemat = linemat.clone();
+		proplinemat.setColor("Color", propColor);
 		
 		Geometry grid = new Geometry("Grid", new Grid(24, 24, 1f));
 		grid.setLocalTranslation(-12f, 0f, -12f);
 		grid.setMaterial(propmat);
 		propNode.attachChild(grid);
 		
-		Geometry goalArrow = new Geometry("Goal Pointer", new Arrow(goal));
+		a = new Arrow(goal);
+		Geometry goalArrow = new Geometry("Goal Pointer", a);
 		goalArrow.setMaterial(arrowmat);
 		propNode.attachChild(goalArrow);
+		
+		goalg = new Geometry("Goal", new Sphere(8,8, 0.5f));
+		goalg.setMaterial(propmat);
+		propNode.attachChild(goalg);
+		TransparentColorControl cc = new TransparentColorControl();
+		cc.setBaseColor(propColor);
+		goalg.addControl(new TimeTracer(proplinemat, 30, 128, cc));
 	}
 
 	public void update(float tpf) {
@@ -137,19 +154,18 @@ public class PoolNeuralNetworkTestState extends BaseAppState {
 			FastMath.nextRandomFloat() * 12 - 6,
 			FastMath.nextRandomFloat() * 12 - 6
 		);
-		getApplication().getCamera().lookAt(goal, Vector3f.UNIT_Y);
 		lastGoalDirection = new Vector3f(
-			FastMath.nextRandomFloat() * 12 - 6,
-			FastMath.nextRandomFloat() * 12 - 6,
-			FastMath.nextRandomFloat() * 12 - 6
-		);
+			FastMath.nextRandomFloat() * 2 - 1,
+			FastMath.nextRandomFloat() * 2 - 1,
+			FastMath.nextRandomFloat() * 2 - 1
+		).normalizeLocal();
 		
 		originalDistance = goal.distance(Vector3f.ZERO);
 	}
 	
 	private void createNeuralNetworks() {
 		for (int i = 0; i < nnets.length; i++) {
-			nnets[i] = new MultiLayerPerceptron(10, 8 , 4);
+			nnets[i] = new MultiLayerPerceptron(4, 6, 4);
 		}
 	}
 
@@ -171,10 +187,12 @@ public class PoolNeuralNetworkTestState extends BaseAppState {
 		node.attachChild(g);
 		
 		//Trace
-		GradientColorController cc = new GradientColorController();
-		cc.setBaseColor(ColorRGBA.Cyan);
-		cc.setSecondaryColor(ColorRGBA.Green);
-		g.addControl(new TimeTracer(linemat, 30, 256, cc));
+//		GradientColorController cc = new GradientColorController();
+//		cc.setBaseColor(ColorRGBA.Cyan);
+//		cc.setSecondaryColor(ColorRGBA.Green);
+		TransparentColorControl cc = new TransparentColorControl();
+		cc.setBaseColor(ColorRGBA.Green);
+		g.addControl(new TimeTracer(linemat, 30, 128, cc));
 		
 		//Physics
 		RigidBodyControl phy = new RigidBodyControl(new SphereCollisionShape(0.5f));
@@ -185,6 +203,24 @@ public class PoolNeuralNetworkTestState extends BaseAppState {
 	}
 
 	private void runGeneration(float tpf) {
+		//set variables ...
+		Vector3f newDirection = new Vector3f(
+			FastMath.nextRandomFloat() * 2 - 1,
+			FastMath.nextRandomFloat() * 2 - 1,
+			FastMath.nextRandomFloat() * 2 - 1
+		).normalizeLocal();
+		newDirection.multLocal(0.05f).addLocal(lastGoalDirection.mult(0.95f));
+		goal.addLocal(newDirection.mult(1.2f));
+		lastGoalDirection = newDirection;
+		originalDistance = goal.distance(Vector3f.ZERO);
+		/** ! **/
+		goal.normalizeLocal().multLocal(12f);
+		
+		
+		//set props ...
+		a.setArrowExtent(goal);
+		goalg.setLocalTranslation(goal);
+		
 		//set inputs ...
 		for(int i = 0; i < nnetCount; i++) {
 			Vector3f currPosition = balls[i].getControl(RigidBodyControl.class).getPhysicsLocation();
@@ -197,10 +233,10 @@ public class PoolNeuralNetworkTestState extends BaseAppState {
 				goalDirection.y,
 				goalDirection.z,
 				
-				Math.min(relativeDistance, 0.99),
+				Math.min(1, 0.99)
 				
 //				0.001, 0.001, 0.001, 0.001, 0.001, 0.001
-				0, 0, 0, 0, 0, 0
+//				0, 0, 0, 0, 0, 0
 			});
 		}
 		
@@ -243,9 +279,8 @@ public class PoolNeuralNetworkTestState extends BaseAppState {
 		runCounter++;
 	}
 	
-	@SuppressWarnings("rawtypes")
 	private void concludeGeneration() {
-		int chunksize = 5;
+		int chunksize = 2;
 		int survivorRatio = 10;
 		
 		Map<NeuralNetwork, Float> sortedScores = sortByValue(scores);
@@ -260,7 +295,7 @@ public class PoolNeuralNetworkTestState extends BaseAppState {
 			Double[] nextWeights = next.getWeights();
 			
 			for(int j = 0; j < survivorRatio; j++) {
-				NeuralNetwork output = new MultiLayerPerceptron(10, 8, 4);
+				NeuralNetwork output = new MultiLayerPerceptron(4, 6, 4);
 				Double[] weights = output.getWeights();
 				for (int k = 0; k < weights.length; k++) {
 					weights[k] = (currentWeights[k] + nextWeights[k]) / chunksize;
