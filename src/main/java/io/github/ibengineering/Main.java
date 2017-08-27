@@ -4,6 +4,7 @@ import com.jme3.app.DebugKeysAppState;
 import com.jme3.app.FlyCamAppState;
 import com.jme3.app.SimpleApplication;
 import com.jme3.app.StatsAppState;
+import com.jme3.app.state.ScreenshotAppState;
 import com.jme3.audio.AudioListenerState;
 import com.jme3.bullet.BulletAppState;
 
@@ -30,6 +31,7 @@ public class Main extends SimpleApplication {
 			new FlyCamAppState(),
 			new AudioListenerState(),
 			new DebugKeysAppState(),
+			new ScreenshotAppState("images/", 0),
 			new PoolNeuralNetworkTestState()
 		);
 	}
