@@ -1,4 +1,4 @@
-package io.github.ibengineering;
+package io.github.ibengineering.tests;
 
 import java.util.Arrays;
 
@@ -24,7 +24,7 @@ import com.jme3.scene.shape.Sphere;
 
 import io.github.mistercavespider.lina.ctrl.TimeTracer;
 
-public class NeuralNetworkTestState extends BaseAppState {
+public class SingleNeuralNetworkTestState extends BaseAppState {
 
 	private RigidBodyControl rbc;
 	private Geometry g;

@@ -7,6 +7,8 @@ import com.jme3.app.StatsAppState;
 import com.jme3.audio.AudioListenerState;
 import com.jme3.bullet.BulletAppState;
 
+import io.github.ibengineering.tests.PoolNeuralNetworkTestState;
+
 public class Main extends SimpleApplication {
 	
 	public static void main( String... args ) {
@@ -28,7 +30,7 @@ public class Main extends SimpleApplication {
 			new FlyCamAppState(),
 			new AudioListenerState(),
 			new DebugKeysAppState(),
-			new NeuralNetworkTestState()
+			new PoolNeuralNetworkTestState()
 		);
 	}
 	
