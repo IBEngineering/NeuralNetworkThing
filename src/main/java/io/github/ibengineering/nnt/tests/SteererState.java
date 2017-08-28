@@ -49,6 +49,7 @@ public final class SteererState extends AbstractEvolverState {
 		
 		getState(BulletAppState.class).getPhysicsSpace().setGravity(Vector3f.ZERO);
 		getState(FlyCamAppState.class).getCamera().setMoveSpeed(55f);
+		getState(FlyCamAppState.class).getCamera().setDragToRotate(true);
 	}
 
 	@Override
@@ -199,8 +200,6 @@ public final class SteererState extends AbstractEvolverState {
 		
 		s.removeControl(RigidBodyControl.class);
 		s.removeControl(TimeTracer.class);
-		
-		
 	}
 
 }

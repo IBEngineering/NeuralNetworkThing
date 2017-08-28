@@ -1,6 +1,5 @@
 package io.github.ibengineering.nnt;
 
-import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -17,6 +16,7 @@ import com.jme3.app.state.BaseAppState;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 
+@SuppressWarnings("rawtypes")
 public abstract class AbstractEvolverState extends BaseAppState implements SmartEvolver {
 
 	/*
@@ -36,8 +36,19 @@ public abstract class AbstractEvolverState extends BaseAppState implements Smart
 	protected Generation currentGeneration;
 	
 	/*
+	 * Evolution
+	 */
+	/**
+	 * By default, high score = good score
+	 * With flipScores, low score = good score
+	 */
+	private boolean flipScores;
+	private int[] neuronLayers = new int[] {4,6,4};
+	
+	/*
 	 * Concurrent
 	 */
+	private boolean waitTillDone = true;
 	private Future<?>[] futures;
 	
 	/*
@@ -47,11 +58,13 @@ public abstract class AbstractEvolverState extends BaseAppState implements Smart
 	protected Node propNode;
 	protected Spatial[] spatials;
 	
+	
+	
 	@Override
 	protected void initialize(Application app) {
 		executorService = Executors.newFixedThreadPool(threadCount);
 		
-		currentGeneration = new Generation(individualCount, 4,6,4);
+		currentGeneration = new Generation(individualCount, neuronLayers);
 		
 		futures = new Future<?>[individualCount];
 		
@@ -136,14 +149,16 @@ public abstract class AbstractEvolverState extends BaseAppState implements Smart
 			Future<?> f = executorService.submit((Runnable)currentGeneration.get(i)::calculate);
 			futures[i] = f;
 		}
-		/* ! wait ! */
-		for (Future<?> f : futures) {
-			try {
-				f.get();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-				e.printStackTrace();
+		if(waitTillDone) {
+			for (Future<?> f : futures) {
+				try {
+					// will wait
+					f.get();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 		
@@ -158,11 +173,45 @@ public abstract class AbstractEvolverState extends BaseAppState implements Smart
 		iterationCount++;
 	}
 
+	/**
+	 * Supposed to be Overriden.
+	 * 
+	 * Called before any input is baked
+	 */
 	protected void preInputs() {}
+	/**
+	 * Supposed to be Overriden.
+	 * 
+	 * Called before a single input is baked
+	 * @param i
+	 */
 	protected void preInput(int i) {}
+	/**
+	 * Creates an array of inputs for the
+	 * neural network found on index 'i'
+	 * @param i	index of the neural network
+	 * @return
+	 */
 	protected abstract double[] bakeInput(int i);
+	/**
+	 * Processes the array of outputs of the
+	 * neural network found on index 'i'
+	 * @param i	index of the neural network
+	 * @return
+	 */
 	protected abstract void processOutput(int i, double[] outputs);
+	/**
+	 * Supposed to be Overriden.
+	 * 
+	 * Called after a single output has been processed.
+	 * @param i
+	 */
 	protected void postOutput(int i) {}
+	/**
+	 * Supposed to be Overriden.
+	 * 
+	 * Called after each output has been processed
+	 */
 	protected void postOutputs() {}
 	
 	@Override
@@ -171,9 +220,9 @@ public abstract class AbstractEvolverState extends BaseAppState implements Smart
 	}
 
 	public void concludeGeneration(int pairSize, int survivorDivider) {
-		Generation nextGeneration = new Generation(individualCount, 4, 6, 4);
+		Generation nextGeneration = new Generation(individualCount, neuronLayers);
 		
-		Map<NeuralNetwork, Float> sortedScores = currentGeneration.scoreNetwork(false);
+		Map<NeuralNetwork, Float> sortedScores = currentGeneration.scoreNetwork(flipScores);
 		NeuralNetwork[] sortedNnets = sortedScores.keySet().toArray(new NeuralNetwork[individualCount]);
 		
 		for(int i = 0; i < individualCount/survivorDivider; i+=pairSize) {

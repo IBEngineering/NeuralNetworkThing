@@ -1,6 +1,5 @@
 package io.github.ibengineering.nnt;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -45,8 +44,13 @@ public class Generation {
 		}
 	}
 	
-	public Map<NeuralNetwork, Float> scoreNetwork(boolean flip) {
-		return sortByValue(scores, flip);
+	/**
+	 * 
+	 * @param flipScores
+	 * @return
+	 */
+	public Map<NeuralNetwork, Float> scoreNetwork(boolean flipScores) {
+		return sortByValue(scores, !flipScores);
 	}
 	
 	public void addScore(int i, float score) {

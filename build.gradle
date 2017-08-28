@@ -3,7 +3,7 @@ apply plugin: 'application'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 
-mainClassName='io.github.ibengineering.Main'
+mainClassName='io.github.ibengineering.nnt.Main'
 
 repositories {
     jcenter()

@@ -8,6 +8,7 @@ import com.jme3.app.state.ScreenshotAppState;
 import com.jme3.audio.AudioListenerState;
 import com.jme3.bullet.BulletAppState;
 
+import io.github.ibengineering.nnt.states.EvolverGuiMainMenuState;
 import io.github.ibengineering.nnt.tests.PoolNeuralNetworkTestState;
 import io.github.ibengineering.nnt.tests.SteererState;
 
@@ -34,7 +35,8 @@ public class Main extends SimpleApplication {
 			new DebugKeysAppState(),
 			new ScreenshotAppState("images/", 0),
 //			new PoolNeuralNetworkTestState()
-			new SteererState()
+			new SteererState(),
+			new EvolverGuiMainMenuState()
 		);
 	}
 	
