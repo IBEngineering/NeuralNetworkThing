@@ -1,7 +1,5 @@
 package io.github.ibengineering.nnt.tests;
 
-import java.sql.Time;
-
 import com.jme3.app.Application;
 import com.jme3.app.FlyCamAppState;
 import com.jme3.bullet.BulletAppState;
@@ -83,19 +81,19 @@ public final class SteererState extends AbstractEvolverState {
 		Geometry grid = new Geometry("Grid", new Grid(24, 24, 1f));
 		grid.setLocalTranslation(-12f, 0f, -12f);
 		grid.setMaterial(propmat);
-		propNode.attachChild(grid);
+//		propNode.attachChild(grid);
 		
 		a = new Arrow(goal);
 		Geometry goalArrow = new Geometry("Goal Pointer", a);
 		goalArrow.setMaterial(arrowmat);
-		propNode.attachChild(goalArrow);
+//		propNode.attachChild(goalArrow);
 		
 		goalg = new Geometry("Goal", new Sphere(8,8, 0.5f));
 		goalg.setMaterial(propmat);
-		propNode.attachChild(goalg);
+//		propNode.attachChild(goalg);
 		TransparentColorControl cc = new TransparentColorControl();
 		cc.setBaseColor(propColor);
-		goalg.addControl(new TimeTracer(proplinemat, 30, 128, cc));
+//		goalg.addControl(new TimeTracer(proplinemat, 30, 128, cc));
 	}
 
 	@Override
@@ -192,14 +190,27 @@ public final class SteererState extends AbstractEvolverState {
 	}
 
 	@Override
+	public void resetControls(Spatial s) {
+		s.getControl(RigidBodyControl.class).setPhysicsLocation(Vector3f.ZERO);;
+		s.getControl(TimeTracer.class).reset();
+	}
+
+	@Override
 	public void removeControls(Spatial s) {
 		RigidBodyControl phy = s.getControl(RigidBodyControl.class);
-		if(phy!=null) {
-			getState(BulletAppState.class).getPhysicsSpace().remove(phy);
-		}
-		
-		s.removeControl(RigidBodyControl.class);
 		s.removeControl(TimeTracer.class);
 	}
+
+	@Override
+	protected void onEnable() {
+		getState(BulletAppState.class).setEnabled(isEnabled());
+	}
+
+	@Override
+	protected void onDisable() {
+		getState(BulletAppState.class).setEnabled(isEnabled());
+	}
+	
+	
 
 }

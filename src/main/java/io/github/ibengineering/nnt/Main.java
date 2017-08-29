@@ -8,8 +8,7 @@ import com.jme3.app.state.ScreenshotAppState;
 import com.jme3.audio.AudioListenerState;
 import com.jme3.bullet.BulletAppState;
 
-import io.github.ibengineering.nnt.states.EvolverGuiMainMenuState;
-import io.github.ibengineering.nnt.tests.PoolNeuralNetworkTestState;
+import io.github.ibengineering.nnt.states.EvolverGuiHudState;
 import io.github.ibengineering.nnt.tests.SteererState;
 
 public class Main extends SimpleApplication {
@@ -34,14 +33,12 @@ public class Main extends SimpleApplication {
 			new AudioListenerState(),
 			new DebugKeysAppState(),
 			new ScreenshotAppState("images/", 0),
-//			new PoolNeuralNetworkTestState()
-			new SteererState(),
-			new EvolverGuiMainMenuState()
+			new SteererState()
 		);
 	}
 	
 	public void simpleInitApp() {
-		stateManager.attach(new BulletAppState());
+		stateManager.attachAll(new BulletAppState(), new EvolverGuiHudState(stateManager.getState(SteererState.class)));
 	}
 }
 

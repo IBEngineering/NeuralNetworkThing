@@ -40,6 +40,6 @@ public interface Evolver {
 	public void createGeneration(boolean newWeights);
 	public void runGeneration();
 	public void concludeGeneration();
-	public void cleanGeneration();
+	public void cleanGeneration(boolean removeSpatials);
 	
 }

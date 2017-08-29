@@ -85,8 +85,11 @@ public abstract class AbstractEvolverState extends BaseAppState implements Smart
 
 	@Override
 	public void processIteration() {
+		if(!isEnabled()) return;
+		
 		if(iterationCount >= iterationLimit) {
-			cleanGeneration();
+			cleanGeneration(false);
+			
 			createGeneration(false);
 			
 			propNode.detachAllChildren();
@@ -100,7 +103,7 @@ public abstract class AbstractEvolverState extends BaseAppState implements Smart
 	
 	@Override
 	protected void cleanup(Application app) {
-		cleanGeneration();
+		cleanGeneration(true);
 		
 		executorService.shutdown();
 		while(!executorService.isTerminated()) {
@@ -115,11 +118,13 @@ public abstract class AbstractEvolverState extends BaseAppState implements Smart
 			concludeGeneration();
 		}
 		
-		createSpatials();
+		createSpatials(!newWeights);
 		onCreateGeneration();
 	}
 	
-	protected void createSpatials() {
+	protected void createSpatials(boolean resetSpatials) {
+		if(resetSpatials) return;
+		
 		for (int i = 0; i < individualCount; i++) {
 			Spatial s = createSpatial(i);
 			baseNode.attachChild(s);
@@ -255,14 +260,15 @@ public abstract class AbstractEvolverState extends BaseAppState implements Smart
 	
 
 	@Override
-	public void cleanGeneration() {
+	public void cleanGeneration(boolean removeSpatials) {
 		for(Spatial s : spatials) {
-			removeControls(s);
-			s.removeFromParent();
+			resetControls(s);
+			if(removeSpatials) s.removeFromParent();
 		}
-		baseNode.detachAllChildren();
+		if(removeSpatials) baseNode.detachAllChildren();;
 	}
 	
+	public void resetControls(Spatial s) {}
 	public void removeControls(Spatial s) {}
 	
 	@Override

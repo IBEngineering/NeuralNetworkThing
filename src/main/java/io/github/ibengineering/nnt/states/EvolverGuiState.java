@@ -5,7 +5,7 @@ import com.jme3.app.state.BaseAppState;
 
 public class EvolverGuiState extends BaseAppState {
 	
-	private EvolverGuiMainMenuState stateMainMenu;
+	private EvolverGuiHudState stateMainMenu;
 
 	@Override
 	protected void initialize(Application app) {
